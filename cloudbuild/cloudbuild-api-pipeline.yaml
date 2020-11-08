@@ -1,0 +1,26 @@
+steps:
+  - name: 'gcr.io/cloud-builders/gcloud'
+    id: 'env'
+    entrypoint: 'bash'
+    args:
+      - -c
+      - |
+
+        if [[ -z "$_NAMESPACE" ]]; then
+          NAMESPACE=$$(scripts/extract-namespace.sh $BRANCH_NAME)
+        else
+          NAMESPACE=$_NAMESPACE
+        fi
+
+        echo "Branch: $BRANCH_NAME"
+        echo "Commit: $COMMIT_SHA"
+        echo "Namespace: $$NAMESPACE"
+
+        echo "$$NAMESPACE" > /workspace/namespace.txt
+
+
+
+timeout: 9000s
+tags: ['build']
+options:
+  substitution_option: 'ALLOW_LOOSE'
