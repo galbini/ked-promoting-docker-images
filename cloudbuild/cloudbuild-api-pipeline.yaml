@@ -91,7 +91,7 @@ steps:
       - |
       source /workspace/build.env
       gcloud run deploy $${TAG_ENV}-ked-pdi \
-          --image eu.gcr.io/$PROJECT_ID/ked-pdi:${SHORT_SHA} \
+          --image 'eu.gcr.io/$PROJECT_ID/ked-pdi:${SHORT_SHA}' \
           --region europe-west1 \
           --platform managed \
           --allow-unauthenticated \
