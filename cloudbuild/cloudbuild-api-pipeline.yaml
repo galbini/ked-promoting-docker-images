@@ -17,10 +17,10 @@ steps:
 
         VERSION=$$(scripts/extract-version.sh branche $BRANCH_NAME)
 
-        echo -e "\e[44mBranch: $BRANCH_NAME"
-        echo -e "\e[44mCommit: $SHORT_SHA"
-        echo -e "\e[44mEnv: $$NAMESPACE"
-        echo -e "\e[44mVersion: $$VERSION"
+        echo -e "\033[44mBranch: $BRANCH_NAME"
+        echo -e "\033[44mCommit: $SHORT_SHA"
+        echo -e "\033[44mEnv: $$NAMESPACE"
+        echo -e "\033[44mVersion: $$VERSION"
 
         echo "export TAG_ENV=$$NAMESPACE" > /workspace/build.env
         echo "export TAG_VERSION=$$VERSION" >> /workspace/build.env
