@@ -25,7 +25,7 @@ steps:
         echo "export TAG_ENV=$$NAMESPACE" > /workspace/build.env
         echo "export TAG_VERSION=$$VERSION" >> /workspace/build.env
 
-        exit 1
+        exit 0
 
   # load the cache from GCS if it exists
   - name: gcr.io/cloud-builders/gsutil
