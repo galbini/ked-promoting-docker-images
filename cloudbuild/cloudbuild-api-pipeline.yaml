@@ -61,11 +61,12 @@ steps:
   
   #build and push image
   - name: gcr.io/kaniko-project/executor:latest
-    args: [
-            '--dockerfile=./Dockerfile',
-            '--destination=eu.gcr.io/$PROJECT_ID/ked-pdi:$SHORT_SHA',
-            '--destination=eu.gcr.io/$PROJECT_ID/ked-pdi:$$(cat /workspace/namespace.txt)'
-          ]
+    entrypoint: bash
+    args:
+      - -c
+      - |
+        NAMESPACE=$$(cat /workspace/namespace.txt)
+        echo "Namespace: $$NAMESPACE"
 
 
 timeout: 9000s
