@@ -16,15 +16,20 @@ steps:
         fi
 
         VERSION=$$(scripts/extract-version.sh branche $BRANCH_NAME)
+        IMAGE_NAME=eu.gcr.io/${PROJECT_ID}/ked-pdi
+        IS_IMAGE_EXIST=$$(scripts/image-exists.sh $$IMAGE_NAME $SHOT_SHA)
 
-        echo -e "\033[44mBranch: $BRANCH_NAME"
-        echo -e "\033[44mCommit: $SHORT_SHA"
-        echo -e "\033[44mEnv: $$NAMESPACE"
-        echo -e "\033[44mVersion: $$VERSION"
+        echo "Branch: $BRANCH_NAME"
+        echo "Commit: $SHORT_SHA"
+        echo "Env: $$NAMESPACE"
+        echo "Version: $$VERSION"
+        echo "Image: $$IMAGE_NAME"
+        echo "Is image exists: $$IS_IMAGE_EXIST"
 
         echo "export TAG_ENV=$$NAMESPACE" > /workspace/build.env
         echo "export TAG_VERSION=$$VERSION" >> /workspace/build.env
-
+        echo "export IMAGE_NAME=$$IMAGE_NAME" >> /workspace/build.env
+        echo "export IS_IMAGE_EXIST=$$IS_IMAGE_EXIST" >> /workspace/build.env
 
   # load the cache from GCS if it exists
   - name: gcr.io/cloud-builders/gsutil
@@ -76,13 +81,13 @@ steps:
         - |
           source /workspace/build.env
           echo "Namespace: $$TAG_ENV"
-          docker build -t eu.gcr.io/$PROJECT_ID/ked-pdi:$SHORT_SHA \
-                       -t eu.gcr.io/$PROJECT_ID/ked-pdi:$$TAG_ENV \
-                       -t eu.gcr.io/$PROJECT_ID/ked-pdi:$$TAG_VERSION \
+          docker build -t $$IMAGE_NAME:$SHORT_SHA \
+                       -t $$IMAGE_NAME:$$TAG_ENV \
+                       -t $$IMAGE_NAME:$$TAG_VERSION \
                        -f Dockerfile .
-          docker push eu.gcr.io/$PROJECT_ID/ked-pdi:$SHORT_SHA
-          docker push eu.gcr.io/$PROJECT_ID/ked-pdi:$$TAG_ENV
-          docker push eu.gcr.io/$PROJECT_ID/ked-pdi:$$TAG_VERSION
+          docker push $$IMAGE_NAME:$SHORT_SHA
+          docker push $$IMAGE_NAME:$$TAG_ENV
+          docker push $$IMAGE_NAME:$$TAG_VERSION
 
   #deploy
   - name: gcr.io/cloud-builders/gcloud
@@ -93,7 +98,7 @@ steps:
         - |
           source /workspace/build.env
           gcloud run deploy $${TAG_ENV}-ked-pdi \
-            --image=eu.gcr.io/$PROJECT_ID/ked-pdi:$SHORT_SHA \
+            --image=$$IMAGE_NAME:$SHORT_SHA \
             --region=europe-west1 \
             --platform=managed \
             --allow-unauthenticated \
