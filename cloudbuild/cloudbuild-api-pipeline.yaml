@@ -24,7 +24,7 @@ steps:
         echo "Env: $$NAMESPACE"
         echo "Version: $$VERSION"
         echo "Image: $$IMAGE_NAME"
-        echo "Is image exists: $$IS_IMAGE_EXIST"
+        echo "Is image exists ? $$IS_IMAGE_EXIST"
 
         echo "export TAG_ENV=$$NAMESPACE" > /workspace/build.env
         echo "export TAG_VERSION=$$VERSION" >> /workspace/build.env

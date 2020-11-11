@@ -7,7 +7,7 @@ NB_IMAGE=$(gcloud container images list-tags $IMAGE --filter=$FILTER --limit=1|w
 
 if [[ $NB_IMAGE -eq 0 ]]
 then
-    echo true
-else
     echo false
+else
+    echo true
 fi
