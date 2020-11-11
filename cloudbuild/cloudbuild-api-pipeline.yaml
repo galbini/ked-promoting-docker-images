@@ -19,7 +19,7 @@ steps:
         echo "Commit: $SHORT_SHA"
         echo "Namespace: $$NAMESPACE"
 
-        echo "$$NAMESPACE" > /workspace/namespace.txt
+        echo "export TAG_ENV=$$NAMESPACE" > /workspace/build.env
 
   # load the cache from GCS if it exists
   - name: gcr.io/cloud-builders/gsutil
@@ -68,9 +68,9 @@ steps:
     args:
         - -c
         - |
-          NAMESPACE=$$(cat /workspace/namespace.txt)
-          echo "Namespace: $$NAMESPACE"
-          docker build -t eu.gcr.io/$PROJECT_ID/ked-pdi:$SHORT_SHA -t eu.gcr.io/$PROJECT_ID/ked-pdi:$$NAMESPACE -f Dockerfile .
+          source /workspace/build.env
+          echo "Namespace: $$TAG_ENV"
+          docker build -t eu.gcr.io/$PROJECT_ID/ked-pdi:$SHORT_SHA -t eu.gcr.io/$PROJECT_ID/ked-pdi:$$TAG_ENV -f Dockerfile .
 
 
 
