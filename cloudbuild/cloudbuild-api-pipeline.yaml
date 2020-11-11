@@ -91,11 +91,11 @@ steps:
       - |
       source /workspace/build.env
       gcloud run deploy $${TAG_ENV}-ked-pdi \
-          --image 'eu.gcr.io/$PROJECT_ID/ked-pdi:${SHORT_SHA}' \
-          --region europe-west1 \
-          --platform managed \
+          --image=eu.gcr.io/$PROJECT_ID/ked-pdi:${SHORT_SHA} \
+          --region=europe-west1 \
+          --platform=managed \
           --allow-unauthenticated \
-          --memory 512M \
+          --memory=512M \
           --set-env-vars=GOOGLE_CLOUD_PROJECT=${PROJECT_ID},ENV=$${TAG_ENV},VERSION=$${TAG_VERSION}
 
 
