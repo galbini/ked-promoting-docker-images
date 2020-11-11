@@ -17,10 +17,10 @@ steps:
 
         VERSION=$$(scripts/extract-version.sh branche $BRANCH_NAME)
 
-        echo "Branch: $BRANCH_NAME"
-        echo "Commit: $SHORT_SHA"
-        echo "Env: $$NAMESPACE"
-        echo "Version: $$VERSION"
+        echo -e "\e[44mBranch: $BRANCH_NAME"
+        echo -e "\e[44mCommit: $SHORT_SHA"
+        echo -e "\e[44mEnv: $$NAMESPACE"
+        echo -e "\e[44mVersion: $$VERSION"
 
         echo "export TAG_ENV=$$NAMESPACE" > /workspace/build.env
         echo "export TAG_VERSION=$$VERSION" >> /workspace/build.env
@@ -66,6 +66,7 @@ steps:
   
   #build and push image
   - name: gcr.io/cloud-builders/docker
+    id: 'build-push-image'
     waitFor:
       - env
       - build
@@ -85,6 +86,7 @@ steps:
 
   #deploy
   - name: gcr.io/cloud-builders/gcloud
+    id: 'deploy'
     entrypoint: bash
     args:
         - -c
@@ -96,7 +98,7 @@ steps:
             --platform=managed \
             --allow-unauthenticated \
             --memory=512M \
-            --set-env-vars=GOOGLE_CLOUD_PROJECT=${PROJECT_ID},ENV=$${TAG_ENV},VERSION=$${TAG_VERSION}
+            --set-env-vars=GOOGLE_CLOUD_PROJECT=${PROJECT_ID},ENV=$${TAG_ENV},VERSION=$${TAG_VERSION},SHORT_SHA=${SHORT_SHA}
 
 
 timeout: 9000s
