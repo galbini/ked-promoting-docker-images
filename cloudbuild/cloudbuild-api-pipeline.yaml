@@ -64,7 +64,7 @@ steps:
     args: [
             '--dockerfile=./Dockerfile',
             '--destination=eu.gcr.io/$PROJECT_ID/ked-pdi:$SHORT_SHA',
-            '--destination=eu.gcr.io/$PROJECT_ID/ked-pdi:$(cat /workspace/namespace.txt)'
+            '--destination=eu.gcr.io/$PROJECT_ID/ked-pdi:$$(cat /workspace/namespace.txt)'
           ]
 
 
