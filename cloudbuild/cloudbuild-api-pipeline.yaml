@@ -44,7 +44,6 @@ steps:
     volumes:
       - name: m2
         path: /root/.m2/
-
   # cache the /root/.m2 folder and upload it to GCS bucket
   - name: gcr.io/cloud-builders/gsutil
     waitFor:
@@ -59,6 +58,13 @@ steps:
     volumes:
       - name: m2
         path: /root/.m2/
+  
+  #build and push image
+  - name: gcr.io/kaniko-project/executor:latest
+    args: [
+            '--dlockerfile=./Dockerfile',
+            '--destination=eu.gcr.io/$PROJECT_ID/ked-pdi:$SHORT_SHA'
+          ]
 
 
 timeout: 9000s
