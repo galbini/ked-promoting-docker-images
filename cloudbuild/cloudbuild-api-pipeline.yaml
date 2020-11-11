@@ -25,7 +25,6 @@ steps:
         echo "export TAG_ENV=$$NAMESPACE" > /workspace/build.env
         echo "export TAG_VERSION=$$VERSION" >> /workspace/build.env
 
-        exit 0
 
   # load the cache from GCS if it exists
   - name: gcr.io/cloud-builders/gsutil
@@ -84,6 +83,20 @@ steps:
           docker push eu.gcr.io/$PROJECT_ID/ked-pdi:$$TAG_ENV
           docker push eu.gcr.io/$PROJECT_ID/ked-pdi:$$TAG_VERSION
 
+  #deploy
+  - name: 'gcr.io/cloud-builders/gcloud'
+    entrypoint: bash
+    args:
+      - -c
+      - |
+      source /workspace/build.env
+      gcloud run deploy $${TAG_ENV}-ked-pdi \
+          --image eu.gcr.io/$PROJECT_ID/ked-pdi:${SHORT_SHA} \
+          --region europe-west1 \
+          --platform managed \
+          --allow-unauthenticated \
+          --memory 512M \
+          --set-env-vars=GOOGLE_CLOUD_PROJECT=${PROJECT_ID},ENV=$${TAG_ENV},VERSION=$${TAG_VERSION}
 
 
 timeout: 9000s
