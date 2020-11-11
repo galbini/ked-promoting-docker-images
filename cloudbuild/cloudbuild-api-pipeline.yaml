@@ -60,13 +60,19 @@ steps:
         path: /root/.m2/
   
   #build and push image
-  - name: gcr.io/kaniko-project/executor:latest
-    entrypoint: /bin/bash
+  - name: gcr.io/cloud-builders/docker
+    waitFor:
+      - env
+      - build
+    entrypoint: bash
     args:
-      - -c
-      - |
-        NAMESPACE=$$(cat /workspace/namespace.txt)
-        echo "Namespace: $$NAMESPACE"
+        - -c
+        - |
+          NAMESPACE=$$(cat /workspace/namespace.txt)
+          echo "Namespace: $$NAMESPACE"
+          docker build -t eu.gcr.io/$PROJECT_ID/ked-pdi:$SHORT_SHA -t eu.gcr.io/$PROJECT_ID/ked-pdi:$$NAMESPACE -f Dockerfile .
+
+
 
 
 timeout: 9000s
