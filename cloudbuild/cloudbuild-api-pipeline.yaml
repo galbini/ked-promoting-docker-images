@@ -62,7 +62,7 @@ steps:
   #build and push image
   - name: gcr.io/kaniko-project/executor:latest
     args: [
-            '--dlockerfile=./Dockerfile',
+            '--dockerfile=./Dockerfile',
             '--destination=eu.gcr.io/$PROJECT_ID/ked-pdi:$SHORT_SHA'
           ]
 
