@@ -71,6 +71,8 @@ steps:
           source /workspace/build.env
           echo "Namespace: $$TAG_ENV"
           docker build -t eu.gcr.io/$PROJECT_ID/ked-pdi:$SHORT_SHA -t eu.gcr.io/$PROJECT_ID/ked-pdi:$$TAG_ENV -f Dockerfile .
+          docker push eu.gcr.io/$PROJECT_ID/ked-pdi:$SHORT_SHA
+          docker push eu.gcr.io/$PROJECT_ID/ked-pdi:$$TAG_ENV
 
 
 
