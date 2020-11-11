@@ -61,7 +61,7 @@ steps:
   
   #build and push image
   - name: gcr.io/kaniko-project/executor:latest
-    entrypoint: bash
+    entrypoint: /bin/bash
     args:
       - -c
       - |
