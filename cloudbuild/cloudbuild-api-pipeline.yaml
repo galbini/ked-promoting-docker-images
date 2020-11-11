@@ -17,7 +17,7 @@ steps:
 
         VERSION=$$(scripts/extract-version.sh branche $BRANCH_NAME)
         IMAGE_NAME=eu.gcr.io/${PROJECT_ID}/ked-pdi
-        IS_IMAGE_EXIST=$$(scripts/image-exists.sh $$IMAGE_NAME $SHOT_SHA)
+        IS_IMAGE_EXIST=$$(scripts/image-exists.sh $$IMAGE_NAME $SHORT_SHA)
 
         echo "Branch: $BRANCH_NAME"
         echo "Commit: $SHORT_SHA"
