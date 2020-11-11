@@ -19,10 +19,13 @@ steps:
 
         echo "Branch: $BRANCH_NAME"
         echo "Commit: $SHORT_SHA"
-        echo "Namespace: $$NAMESPACE"
+        echo "Env: $$NAMESPACE"
+        echo "Version: $$VERSION"
 
         echo "export TAG_ENV=$$NAMESPACE" > /workspace/build.env
         echo "export TAG_VERSION=$$VERSION" >> /workspace/build.env
+
+        exit 1
 
   # load the cache from GCS if it exists
   - name: gcr.io/cloud-builders/gsutil
