@@ -1,11 +1,23 @@
 #!/bin/bash
 
-BRANCH_NAME=$1
+FROM=$1
 
-if [[ "$BRANCH_NAME" =~ feature/*/* ]]
+from_branche_name() {
+
+    BRANCH_NAME=$1
+    if [[ "$BRANCH_NAME" =~ feature/* ]]
+    then
+        echo feat
+    elif [[ "$BRANCH_NAME" =~ develop ]]
+    then
+        echo int
+    elif [[ "$BRANCH_NAME" =~ release/* ]]
+    then
+        echo stg
+    fi
+}
+
+if [[ "$FROM" = branche ]]
 then
-	NAMESPACE=$(cut -d'/' -f2 <<< ${BRANCH_NAME})
-	echo ${NAMESPACE}
-else
-	echo ${BRANCH_NAME}
+    from_branche_name $2
 fi

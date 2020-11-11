@@ -10,13 +10,13 @@ steps:
       - |
 
         if [[ -z "$_NAMESPACE" ]]; then
-          NAMESPACE=$$(scripts/extract-namespace.sh $BRANCH_NAME)
+          NAMESPACE=$$(scripts/extract-namespace.sh branche $BRANCH_NAME)
         else
           NAMESPACE=$_NAMESPACE
         fi
 
         echo "Branch: $BRANCH_NAME"
-        echo "Commit: $COMMIT_SHA"
+        echo "Commit: $SHORT_SHA"
         echo "Namespace: $$NAMESPACE"
 
         echo "$$NAMESPACE" > /workspace/namespace.txt
@@ -63,7 +63,8 @@ steps:
   - name: gcr.io/kaniko-project/executor:latest
     args: [
             '--dockerfile=./Dockerfile',
-            '--destination=eu.gcr.io/$PROJECT_ID/ked-pdi:$SHORT_SHA'
+            '--destination=eu.gcr.io/$PROJECT_ID/ked-pdi:$SHORT_SHA',
+            '--destination=eu.gcr.io/$PROJECT_ID/ked-pdi:$(cat /workspace/namespace.txt)'
           ]
 
 
