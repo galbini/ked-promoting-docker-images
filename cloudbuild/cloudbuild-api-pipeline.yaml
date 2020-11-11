@@ -15,11 +15,14 @@ steps:
           NAMESPACE=$_NAMESPACE
         fi
 
+        VERSION=$$(scripts/extract-version.sh branche $BRANCH_NAME)
+
         echo "Branch: $BRANCH_NAME"
         echo "Commit: $SHORT_SHA"
         echo "Namespace: $$NAMESPACE"
 
         echo "export TAG_ENV=$$NAMESPACE" > /workspace/build.env
+        echo "export TAG_VERSION=$$VERSION" >> /workspace/build.env
 
   # load the cache from GCS if it exists
   - name: gcr.io/cloud-builders/gsutil
@@ -70,10 +73,13 @@ steps:
         - |
           source /workspace/build.env
           echo "Namespace: $$TAG_ENV"
-          docker build -t eu.gcr.io/$PROJECT_ID/ked-pdi:$SHORT_SHA -t eu.gcr.io/$PROJECT_ID/ked-pdi:$$TAG_ENV -f Dockerfile .
+          docker build -t eu.gcr.io/$PROJECT_ID/ked-pdi:$SHORT_SHA \
+                       -t eu.gcr.io/$PROJECT_ID/ked-pdi:$$TAG_ENV \
+                       -t eu.gcr.io/$PROJECT_ID/ked-pdi:$$TAG_VERSION \
+                       -f Dockerfile .
           docker push eu.gcr.io/$PROJECT_ID/ked-pdi:$SHORT_SHA
           docker push eu.gcr.io/$PROJECT_ID/ked-pdi:$$TAG_ENV
-
+          docker push eu.gcr.io/$PROJECT_ID/ked-pdi:$$TAG_VERSION
 
 
 
