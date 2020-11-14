@@ -19,7 +19,7 @@ steps:
         path: /root/.m2/
   #build service
   - name: 'maven:3.6.2-jdk-12'
-    id: 'build'
+    id: 'mvn build'
     entrypoint: 'mvn'
     args: ['clean','package','-f','kpdi-api/pom.xml']
     volumes:
@@ -27,8 +27,6 @@ steps:
         path: /root/.m2/
   # cache the /root/.m2 folder and upload it to GCS bucket
   - name: gcr.io/cloud-builders/gsutil
-    waitFor:
-      - build
     dir: /root
     entrypoint: bash
     args:
@@ -43,9 +41,6 @@ steps:
   #build and push image
   - name: gcr.io/cloud-builders/docker
     id: 'build-push-image'
-    waitFor:
-      - env
-      - build
     entrypoint: bash
     args:
         - -c
