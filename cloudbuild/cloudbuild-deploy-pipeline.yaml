@@ -1,5 +1,6 @@
 substitutions:
-  _SERVICE_NAME: ${_SHORT_SHA}
+  _IMAGE_TAG: ${_SHORT_SHA}
+
 steps:
   #deploy
   - name: gcr.io/cloud-builders/gcloud
