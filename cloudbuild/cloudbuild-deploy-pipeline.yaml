@@ -19,7 +19,7 @@ steps:
             --set-env-vars=GOOGLE_CLOUD_PROJECT=${PROJECT_ID},ENV=${_ENV},VERSION=${_VERSION},SHORT_SHA=${_SHORT_SHA}
 
 timeout: 9000s
-tags: ['deploy','${_ENV}','${_VERSION}','${_SHORT_SHA}']
+tags: ['deploy','${_SHORT_SHA}','${_VERSION}','${_ENV}']
 
 options:
   dynamic_substitutions: true

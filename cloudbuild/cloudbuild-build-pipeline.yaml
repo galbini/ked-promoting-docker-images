@@ -60,4 +60,4 @@ steps:
 
 
 timeout: 9000s
-tags: ['build','${_ENV}','${_VERSION}','${_SHORT_SHA}']
+tags: ['build','${_SHORT_SHA}','${_VERSION}','${_ENV}']
