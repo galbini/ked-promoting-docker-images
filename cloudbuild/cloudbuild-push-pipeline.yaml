@@ -20,18 +20,14 @@ steps:
       - -c
       - |
         source /workspace/build.env
-
         if [[ "$$IS_IMAGE_EXIST" == false ]]
         then
-              echo "Image not exists !"
               gcloud builds submit \
                     --config=cloudbuild/cloudbuild-build-pipeline.yaml \
                     --substitutions=_ENV=$$ENV,_VERSION=$$VERSION,_SHORT_SHA=$SHORT_SHA,_IMAGE_NAME=$_IMAGE_NAME
         else
-              echo "Image exists !"
+              echo "Image $SHORT_SHA exists !"
         fi
-
-
 
   #deploy
   - name: gcr.io/cloud-builders/gcloud
@@ -40,12 +36,15 @@ steps:
     args:
         - -c
         - |
-          exit 1
           source /workspace/build.env
-          gcloud builds submit \
-                --config=cloudbuild/cloudbuild-deploy-pipeline.yaml \
-                --substitutions=_ENV=$$ENV,_VERSION=$$VERSION,_SHORT_SHA=$SHORT_SHA,_IMAGE_NAME=$_IMAGE_NAME
-
+          if [[ "$$IS_IMAGE_EXIST" == false ]]
+          then
+              gcloud builds submit \
+                  --config=cloudbuild/cloudbuild-deploy-pipeline.yaml \
+                  --substitutions=_ENV=$$ENV,_VERSION=$$VERSION,_SHORT_SHA=$SHORT_SHA,_IMAGE_NAME=$_IMAGE_NAME
+          else
+              echo "Image $SHORT_SHA exists !"
+          fi
 
 timeout: 9000s
 tags: ['push']
