@@ -10,8 +10,7 @@ steps:
       - |
         scripts/config-env.sh branch $BRANCH_NAME $_IMAGE_NAME $SHORT_SHA > /workspace/build.env
         source /workspace/build.env
-        env
-        exit 1
+        printenv ENV VERSION
   #build
   - name: gcr.io/cloud-builders/gcloud
     id: 'build'
@@ -20,9 +19,15 @@ steps:
       - -c
       - |
         source /workspace/build.env
-        gcloud builds submit \
-              --config=cloudbuild/cloudbuild-build-pipeline.yaml \
-              --substitutions=_ENV=$$ENV,_VERSION=$$VERSION,_SHORT_SHA=$SHORT_SHA,_IMAGE_NAME=$_IMAGE_NAME
+
+        if (( $$IS_IMAGE_EXIST == false )); then
+              gcloud builds submit \
+                    --config=cloudbuild/cloudbuild-build-pipeline.yaml \
+                    --substitutions=_ENV=$$ENV,_VERSION=$$VERSION,_SHORT_SHA=$SHORT_SHA,_IMAGE_NAME=$_IMAGE_NAME
+        else
+              echo "Image exists !"
+        fi
+
 
 
   #deploy
@@ -32,6 +37,7 @@ steps:
     args:
         - -c
         - |
+          exit 1
           source /workspace/build.env
           gcloud builds submit \
                 --config=cloudbuild/cloudbuild-deploy-pipeline.yaml \

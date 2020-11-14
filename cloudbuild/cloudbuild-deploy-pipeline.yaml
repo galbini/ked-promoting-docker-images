@@ -1,3 +1,5 @@
+substitutions:
+  _SERVICE_NAME: ${_ENV}-ked-pdi
 
 steps:
   #deploy
@@ -8,7 +10,7 @@ steps:
         - -c
         - |
           source /workspace/build.env
-          gcloud run deploy ${_ENV}-ked-pdi \
+          gcloud run deploy ${_SERVICE_NAME} \
             --image=${_IMAGE_NAME}:${_SHORT_SHA} \
             --region=europe-west1 \
             --platform=managed \
