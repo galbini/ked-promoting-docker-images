@@ -11,6 +11,7 @@ steps:
         scripts/config-env.sh branch $BRANCH_NAME $_IMAGE_NAME $SHORT_SHA > /workspace/build.env
         source /workspace/build.env
         printenv ENV VERSION IMAGE_NAME IS_IMAGE_EXIST
+
   #build
   - name: gcr.io/cloud-builders/gcloud
     id: 'build'
