@@ -23,7 +23,6 @@ steps:
         if [[ "$$IS_IMAGE_EXIST" == false ]]
         then
               echo "Image not exists !"
-              exit 1
               gcloud builds submit \
                     --config=cloudbuild/cloudbuild-build-pipeline.yaml \
                     --substitutions=_ENV=$$ENV,_VERSION=$$VERSION,_SHORT_SHA=$SHORT_SHA,_IMAGE_NAME=$_IMAGE_NAME
