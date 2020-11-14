@@ -47,6 +47,6 @@ steps:
           fi
 
 timeout: 9000s
-tags: ['push']
+tags: ['push','${SHORT_SHA}']
 options:
   substitution_option: 'ALLOW_LOOSE'
