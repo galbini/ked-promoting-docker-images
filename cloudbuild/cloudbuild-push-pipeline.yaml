@@ -41,7 +41,7 @@ steps:
         source /workspace/build.env
         gcloud builds submit \
               --config=cloudbuild/cloudbuild-build-pipeline.yaml \
-              --substitutions=_ENV=$$TAG_ENV,_VERSION=$$TAG_ENV
+              --substitutions=_ENV=$$TAG_ENV,_VERSION=$$TAG_VERSION,_SHORT_SHA=$SHORT_SHA,_IMAGE_NAME=$$IMAGE_NAME
 
 
   #deploy
@@ -54,7 +54,7 @@ steps:
           source /workspace/build.env
           gcloud builds submit \
                 --config=cloudbuild/cloudbuild-deploy-pipeline.yaml \
-                --substitutions=_ENV=$$TAG_ENV,_VERSION=$$TAG_ENV
+                --substitutions=_ENV=$$TAG_ENV,_VERSION=$$TAG_VERSION,_SHORT_SHA=$SHORT_SHA,_IMAGE_NAME=$$IMAGE_NAME
 
 
 timeout: 9000s

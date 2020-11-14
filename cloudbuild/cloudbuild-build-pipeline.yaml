@@ -47,15 +47,15 @@ steps:
     args:
         - -c
         - |
-          docker build -t $$IMAGE_NAME:${SHORT_SHA} \
-                       -t $$IMAGE_NAME:${_ENV} \
-                       -t $$IMAGE_NAME:${_VERSION} \
+          docker build -t ${_IMAGE_NAME}:${_SHORT_SHA} \
+                       -t ${_IMAGE_NAME}:${_ENV} \
+                       -t ${_IMAGE_NAME}:${_VERSION} \
                        -f Dockerfile .
-          docker push $$IMAGE_NAME:${SHORT_SHA}
-          docker push $$IMAGE_NAME:${_ENV}
-          docker push $$IMAGE_NAME:${_VERSION}
+          docker push ${_IMAGE_NAME}:${_SHORT_SHA}
+          docker push ${_IMAGE_NAME}:${_ENV}
+          docker push ${_IMAGE_NAME}:${_VERSION}
 
 
 
 timeout: 9000s
-tags: ['build','${_ENV}','${_VERSION}','${SHORT_SHA}']
+tags: ['build','${_ENV}','${_VERSION}','${_SHORT_SHA}']
