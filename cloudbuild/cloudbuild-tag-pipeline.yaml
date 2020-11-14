@@ -13,20 +13,20 @@ steps:
         printenv ENV VERSION IMAGE_NAME IS_IMAGE_EXIST
 
   - name: gcr.io/cloud-builders/docker
-      id: 'pull-tag-and-push-image'
-      entrypoint: bash
-      args:
-        - -c
-        - |
-          docker pull ${_IMAGE_NAME}:${_SHORT_SHA}
+    id: 'pull-tag-and-push-image'
+    entrypoint: bash
+    args:
+      - -c
+      - |
+        docker pull ${_IMAGE_NAME}:${_SHORT_SHA}
 
-          docker tag ${_IMAGE_NAME}:${_SHORT_SHA} \
-                       -t ${_IMAGE_NAME}:${_ENV}
-          docker tag ${_IMAGE_NAME}:${_SHORT_SHA} \
-                       -t ${_IMAGE_NAME}:${_VERSION}
+        docker tag ${_IMAGE_NAME}:${_SHORT_SHA} \
+                     -t ${_IMAGE_NAME}:${_ENV}
+        docker tag ${_IMAGE_NAME}:${_SHORT_SHA} \
+                     -t ${_IMAGE_NAME}:${_VERSION}
 
-          docker push ${_IMAGE_NAME}:${_ENV}
-          docker push ${_IMAGE_NAME}:${_VERSION}
+        docker push ${_IMAGE_NAME}:${_ENV}
+        docker push ${_IMAGE_NAME}:${_VERSION}
 
   #deploy
   - name: gcr.io/cloud-builders/gcloud
