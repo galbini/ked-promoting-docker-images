@@ -4,7 +4,7 @@ FROM=$1
 IMAGE_NAME=$3
 SHORT_SHA=$4
 
-env_from_branche_name() {
+env_from_branch_name() {
 
     BRANCH_NAME=$1
     if [[ "$BRANCH_NAME" =~ feature/* ]]
@@ -19,7 +19,7 @@ env_from_branche_name() {
     fi
 }
 
-version_from_branche_name() {
+version_from_branch_name() {
 
     BRANCH_NAME=$1
     if [[ "$BRANCH_NAME" =~ feature/* ]]
@@ -52,10 +52,10 @@ is_image_exist() {
 
 
 
-if [[ "$FROM" = branche ]]
+if [[ "$FROM" = branch ]]
 then
-    ENV=$(env_from_branche_name $2)
-    VERSION=$(version_from_branche_name $2)
+    ENV=$(env_from_branch_name $2)
+    VERSION=$(version_from_branch_name $2)
     EXIST=$(is_image_exist $IMAGE_NAME $SHORT_SHA)
 fi
 
