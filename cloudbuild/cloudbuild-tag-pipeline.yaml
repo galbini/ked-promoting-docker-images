@@ -19,17 +19,20 @@ steps:
       - -c
       - |
         source /workspace/build.env
+        if [[ "$$IS_IMAGE_EXIST" == true ]]
+        then
+            docker pull ${_IMAGE_NAME}:${SHORT_SHA}
 
-        docker pull ${_IMAGE_NAME}:${_SHORT_SHA}
+            docker tag ${_IMAGE_NAME}:${SHORT_SHA} \
+                       ${_IMAGE_NAME}:$${ENV}
+            docker tag ${_IMAGE_NAME}:${SHORT_SHA} \
+                       ${_IMAGE_NAME}:$${VERSION}
 
-        docker tag ${_IMAGE_NAME}:${_SHORT_SHA} \
-                   ${_IMAGE_NAME}:${_ENV}
-        docker tag ${_IMAGE_NAME}:${_SHORT_SHA} \
-                   ${_IMAGE_NAME}:${_VERSION}
-
-        docker push ${_IMAGE_NAME}:${_ENV}
-        docker push ${_IMAGE_NAME}:${_VERSION}
-
+            docker push ${_IMAGE_NAME}:$${ENV}
+            docker push ${_IMAGE_NAME}:$${VERSION}
+        else
+            echo "Image $SHORT_SHA not exists !"
+        fi
   #deploy
   - name: gcr.io/cloud-builders/gcloud
     id: 'deploy'
@@ -38,13 +41,13 @@ steps:
         - -c
         - |
           source /workspace/build.env
-          if [[ "$$IS_IMAGE_EXIST" == false ]]
+          if [[ "$$IS_IMAGE_EXIST" == true ]]
           then
               gcloud builds submit \
                   --config=cloudbuild/cloudbuild-deploy-pipeline.yaml \
                   --substitutions=_ENV=$$ENV,_VERSION=$$VERSION,_SHORT_SHA=$SHORT_SHA,_IMAGE_NAME=$_IMAGE_NAME,_SERVICE_NAME=$${ENV}-ked-pdi
           else
-              echo "Image $SHORT_SHA exists !"
+              echo "Image $SHORT_SHA not exists !"
           fi
 
 timeout: 9000s
