@@ -1,5 +1,5 @@
 substitutions:
-  _GCS_CACHE_BUCKET: cloudbuild-m2repo
+  _IMAGE_NAME: eu.gcr.io/${PROJECT_ID}/ked-pdi
 
 steps:
   - name: gcr.io/cloud-builders/gcloud
@@ -9,9 +9,7 @@ steps:
       - -c
       - |
 
-        IMAGE_NAME=eu.gcr.io/${PROJECT_ID}/ked-pdi
-
-        scripts/config-env.sh branch $BRANCH_NAME $$IMAGE_NAME $SHORT_SHA > /workspace/build.env
+        scripts/config-env.sh branch $BRANCH_NAME $_IMAGE_NAME $SHORT_SHA > /workspace/build.env
 
         source /workspace/build.env
 
@@ -19,7 +17,7 @@ steps:
         echo "Commit: $SHORT_SHA"
         echo "Env: $$ENV"
         echo "Version: $$VERSION"
-        echo "Image: $$IMAGE_NAME"
+        echo "Image: $_IMAGE_NAME"
         echo "Is image exists ? $$IS_IMAGE_EXIST"
 
         exit 1
@@ -34,7 +32,7 @@ steps:
         source /workspace/build.env
         gcloud builds submit \
               --config=cloudbuild/cloudbuild-build-pipeline.yaml \
-              --substitutions=_ENV=$$ENV,_VERSION=$$VERSION,_SHORT_SHA=$SHORT_SHA,_IMAGE_NAME=$$IMAGE_NAME
+              --substitutions=_ENV=$$ENV,_VERSION=$$VERSION,_SHORT_SHA=$SHORT_SHA,_IMAGE_NAME=$_IMAGE_NAME
 
 
   #deploy
@@ -47,7 +45,7 @@ steps:
           source /workspace/build.env
           gcloud builds submit \
                 --config=cloudbuild/cloudbuild-deploy-pipeline.yaml \
-                --substitutions=_ENV=$$ENV,_VERSION=$$VERSION,_SHORT_SHA=$SHORT_SHA,_IMAGE_NAME=$$IMAGE_NAME
+                --substitutions=_ENV=$$ENV,_VERSION=$$VERSION,_SHORT_SHA=$SHORT_SHA,_IMAGE_NAME=$_IMAGE_NAME
 
 
 timeout: 9000s
