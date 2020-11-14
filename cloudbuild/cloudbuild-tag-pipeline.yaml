@@ -18,6 +18,8 @@ steps:
     args:
       - -c
       - |
+        source /workspace/build.env
+
         docker pull ${_IMAGE_NAME}:${_SHORT_SHA}
 
         docker tag ${_IMAGE_NAME}:${_SHORT_SHA} \
