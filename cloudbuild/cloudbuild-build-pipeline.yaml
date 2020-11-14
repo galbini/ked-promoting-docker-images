@@ -17,6 +17,7 @@ steps:
     volumes:
       - name: m2
         path: /root/.m2/
+
   #build service
   - name: 'maven:3.6.2-jdk-12'
     id: 'mvn build'
@@ -25,6 +26,7 @@ steps:
     volumes:
       - name: m2
         path: /root/.m2/
+
   # cache the /root/.m2 folder and upload it to GCS bucket
   - name: gcr.io/cloud-builders/gsutil
     dir: /root
