@@ -1,6 +1,5 @@
 
 steps:
-  -
   #deploy
   - name: gcr.io/cloud-builders/gcloud
     id: 'deploy'
@@ -16,7 +15,6 @@ steps:
             --allow-unauthenticated \
             --memory=512M \
             --set-env-vars=GOOGLE_CLOUD_PROJECT=${PROJECT_ID},ENV=${_ENV},VERSION=${_VERSION},SHORT_SHA=${SHORT_SHA}
-
 
 timeout: 9000s
 tags: ['deploy','${_ENV}','${_VERSION}','${SHORT_SHA}']

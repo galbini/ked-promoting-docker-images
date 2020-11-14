@@ -2,35 +2,6 @@ substitutions:
   _GCS_CACHE_BUCKET: cloudbuild-m2repo
 
 steps:
-  - name: gcr.io/cloud-builders/gcloud
-    id: 'env'
-    entrypoint: 'bash'
-    args:
-      - -c
-      - |
-
-        if [[ -z "$_NAMESPACE" ]]; then
-          NAMESPACE=$$(scripts/extract-namespace.sh branche $BRANCH_NAME)
-        else
-          NAMESPACE=$_NAMESPACE
-        fi
-
-        VERSION=$$(scripts/extract-version.sh branche $BRANCH_NAME)
-        IMAGE_NAME=eu.gcr.io/${PROJECT_ID}/ked-pdi
-        IS_IMAGE_EXIST=$$(scripts/image-exists.sh $$IMAGE_NAME $SHORT_SHA)
-
-        echo "Branch: $BRANCH_NAME"
-        echo "Commit: $SHORT_SHA"
-        echo "Env: $$NAMESPACE"
-        echo "Version: $$VERSION"
-        echo "Image: $$IMAGE_NAME"
-        echo "Is image exists ? $$IS_IMAGE_EXIST"
-
-        echo "export TAG_ENV=$$NAMESPACE" > /workspace/build.env
-        echo "export TAG_VERSION=$$VERSION" >> /workspace/build.env
-        echo "export IMAGE_NAME=$$IMAGE_NAME" >> /workspace/build.env
-        echo "export IS_IMAGE_EXIST=$$IS_IMAGE_EXIST" >> /workspace/build.env
-
   # load the cache from GCS if it exists
   - name: gcr.io/cloud-builders/gsutil
     dir: /root
@@ -79,34 +50,15 @@ steps:
     args:
         - -c
         - |
-          source /workspace/build.env
-          echo "Namespace: $$TAG_ENV"
-          docker build -t $$IMAGE_NAME:$SHORT_SHA \
-                       -t $$IMAGE_NAME:$$TAG_ENV \
-                       -t $$IMAGE_NAME:$$TAG_VERSION \
+          docker build -t $$IMAGE_NAME:${SHORT_SHA} \
+                       -t $$IMAGE_NAME:${_ENV} \
+                       -t $$IMAGE_NAME:${_VERSION} \
                        -f Dockerfile .
-          docker push $$IMAGE_NAME:$SHORT_SHA
-          docker push $$IMAGE_NAME:$$TAG_ENV
-          docker push $$IMAGE_NAME:$$TAG_VERSION
+          docker push $$IMAGE_NAME:${SHORT_SHA}
+          docker push $$IMAGE_NAME:${_ENV}
+          docker push $$IMAGE_NAME:${_VERSION}
 
-  #deploy
-  - name: gcr.io/cloud-builders/gcloud
-    id: 'deploy'
-    entrypoint: bash
-    args:
-        - -c
-        - |
-          source /workspace/build.env
-          gcloud run deploy $${TAG_ENV}-ked-pdi \
-            --image=$$IMAGE_NAME:$SHORT_SHA \
-            --region=europe-west1 \
-            --platform=managed \
-            --allow-unauthenticated \
-            --memory=512M \
-            --set-env-vars=GOOGLE_CLOUD_PROJECT=${PROJECT_ID},ENV=$${TAG_ENV},VERSION=$${TAG_VERSION},SHORT_SHA=${SHORT_SHA}
 
 
 timeout: 9000s
-tags: ['build']
-options:
-  substitution_option: 'ALLOW_LOOSE'
+tags: ['build','${_ENV}','${_VERSION}','${SHORT_SHA}']
