@@ -21,3 +21,5 @@ steps:
 timeout: 9000s
 tags: ['deploy','${_ENV}','${_VERSION}','${_SHORT_SHA}']
 
+options:
+  dynamic_substitutions: true
