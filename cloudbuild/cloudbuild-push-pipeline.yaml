@@ -3,25 +3,15 @@ substitutions:
 
 steps:
   - name: gcr.io/cloud-builders/gcloud
-    id: 'env'
+    id: 'config-env'
     entrypoint: 'bash'
     args:
       - -c
       - |
-
         scripts/config-env.sh branch $BRANCH_NAME $_IMAGE_NAME $SHORT_SHA > /workspace/build.env
-
         source /workspace/build.env
-
-        echo "Branch: $BRANCH_NAME"
-        echo "Commit: $SHORT_SHA"
-        echo "Env: $$ENV"
-        echo "Version: $$VERSION"
-        echo "Image: $_IMAGE_NAME"
-        echo "Is image exists ? $$IS_IMAGE_EXIST"
-
+        env
         exit 1
-
   #build
   - name: gcr.io/cloud-builders/gcloud
     id: 'build'
