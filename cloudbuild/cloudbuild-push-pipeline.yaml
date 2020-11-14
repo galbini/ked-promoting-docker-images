@@ -13,7 +13,7 @@ steps:
 
         ./scripts/config-env.sh branch $$BRANCH_NAME $$IMAGE_NAME $SHORT_SHA > /workspace/build.env
 
-        ll .
+        ls -la .
 
         source /workspace/build.env
 
