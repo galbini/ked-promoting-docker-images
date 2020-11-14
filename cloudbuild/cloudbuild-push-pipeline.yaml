@@ -1,0 +1,108 @@
+substitutions:
+  _GCS_CACHE_BUCKET: cloudbuild-m2repo
+
+steps:
+  - name: gcr.io/cloud-builders/gcloud
+    id: 'env'
+    entrypoint: 'bash'
+    args:
+      - -c
+      - |
+
+        if [[ -z "$_NAMESPACE" ]]; then
+          NAMESPACE=$$(scripts/extract-namespace.sh branche $BRANCH_NAME)
+        else
+          NAMESPACE=$_NAMESPACE
+        fi
+
+        VERSION=$$(scripts/extract-version.sh branche $BRANCH_NAME)
+        IMAGE_NAME=eu.gcr.io/${PROJECT_ID}/ked-pdi
+        IS_IMAGE_EXIST=$$(scripts/image-exists.sh $$IMAGE_NAME $SHORT_SHA)
+
+        echo "Branch: $BRANCH_NAME"
+        echo "Commit: $SHORT_SHA"
+        echo "Env: $$NAMESPACE"
+        echo "Version: $$VERSION"
+        echo "Image: $$IMAGE_NAME"
+        echo "Is image exists ? $$IS_IMAGE_EXIST"
+
+        echo "export TAG_ENV=$$NAMESPACE" > /workspace/build.env
+        echo "export TAG_VERSION=$$VERSION" >> /workspace/build.env
+        echo "export IMAGE_NAME=$$IMAGE_NAME" >> /workspace/build.env
+        echo "export IS_IMAGE_EXIST=$$IS_IMAGE_EXIST" >> /workspace/build.env
+
+  # load the cache from GCS if it exists
+  - name: gcr.io/cloud-builders/gsutil
+    dir: /root
+    entrypoint: bash
+    args:
+      - -c
+      - |
+        (
+          ls -la /root/.m2
+          gsutil cp gs://${PROJECT_ID}_${_GCS_CACHE_BUCKET}/m2-cache.tar.gz /tmp/m2-cache.tar.gz &&
+          tar -xzf /tmp/m2-cache.tar.gz
+        ) || echo 'Cache not found'
+    volumes:
+      - name: m2
+        path: /root/.m2/
+  #build service
+  - name: 'maven:3.6.2-jdk-12'
+    id: 'build'
+    entrypoint: 'mvn'
+    args: ['clean','package','-f','kpdi-api/pom.xml']
+    volumes:
+      - name: m2
+        path: /root/.m2/
+  # cache the /root/.m2 folder and upload it to GCS bucket
+  - name: gcr.io/cloud-builders/gsutil
+    waitFor:
+      - build
+    dir: /root
+    entrypoint: bash
+    args:
+      - -c
+      - |
+        tar -czf /tmp/m2-cache.tar.gz .m2 &&
+        gsutil cp /tmp/m2-cache.tar.gz gs://${PROJECT_ID}_${_GCS_CACHE_BUCKET}/m2-cache.tar.gz
+    volumes:
+      - name: m2
+        path: /root/.m2/
+  
+  #build and push image
+  - name: gcr.io/cloud-builders/docker
+    id: 'build-push-image'
+    waitFor:
+      - env
+      - build
+    entrypoint: bash
+    args:
+        - -c
+        - |
+          source /workspace/build.env
+          echo "Namespace: $$TAG_ENV"
+          docker build -t $$IMAGE_NAME:$SHORT_SHA \
+                       -t $$IMAGE_NAME:$$TAG_ENV \
+                       -t $$IMAGE_NAME:$$TAG_VERSION \
+                       -f Dockerfile .
+          docker push $$IMAGE_NAME:$SHORT_SHA
+          docker push $$IMAGE_NAME:$$TAG_ENV
+          docker push $$IMAGE_NAME:$$TAG_VERSION
+
+  #deploy
+  - name: gcr.io/cloud-builders/gcloud
+    id: 'deploy'
+    entrypoint: bash
+    args:
+        - -c
+        - |
+          source /workspace/build.env
+          gcloud builds submit \
+                --config=cloudbuild/cloudbuild-deploy-pipeline.yaml \
+                --substitutions=_ENV=$$TAG_ENV,_VERSION=$$TAG_ENV
+
+
+timeout: 9000s
+tags: ['push']
+options:
+  substitution_option: 'ALLOW_LOOSE'
