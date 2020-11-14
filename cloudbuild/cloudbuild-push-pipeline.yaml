@@ -11,9 +11,7 @@ steps:
 
         IMAGE_NAME=eu.gcr.io/${PROJECT_ID}/ked-pdi
 
-        $(./scripts/config-env.sh branch $$BRANCH_NAME $$IMAGE_NAME $SHORT_SHA)
-
-        ls -la .
+        $$(./scripts/config-env.sh branch $$BRANCH_NAME $$IMAGE_NAME $SHORT_SHA)
 
         source /workspace/build.env
 
