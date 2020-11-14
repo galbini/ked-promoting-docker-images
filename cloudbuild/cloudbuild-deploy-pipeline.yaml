@@ -2,7 +2,7 @@
 steps:
   #deploy
   - name: gcr.io/cloud-builders/gcloud
-    id: 'deploy'
+    id: 'deploy-to-cloud-run'
     entrypoint: bash
     args:
         - -c

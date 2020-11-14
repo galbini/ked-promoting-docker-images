@@ -4,6 +4,7 @@ substitutions:
 steps:
   # load the cache from GCS if it exists
   - name: gcr.io/cloud-builders/gsutil
+    id: 'load-mvn-cache'
     dir: /root
     entrypoint: bash
     args:
@@ -29,6 +30,7 @@ steps:
 
   # cache the /root/.m2 folder and upload it to GCS bucket
   - name: gcr.io/cloud-builders/gsutil
+    id: 'save-mvn-cache'
     dir: /root
     entrypoint: bash
     args:
@@ -42,7 +44,7 @@ steps:
   
   #build and push image
   - name: gcr.io/cloud-builders/docker
-    id: 'build-push-image'
+    id: 'build-and-push-image'
     entrypoint: bash
     args:
         - -c

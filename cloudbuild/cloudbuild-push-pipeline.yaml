@@ -9,27 +9,18 @@ steps:
       - -c
       - |
 
-        if [[ -z "$_NAMESPACE" ]]; then
-          NAMESPACE=$$(scripts/extract-namespace.sh branche $BRANCH_NAME)
-        else
-          NAMESPACE=$_NAMESPACE
-        fi
-
-        VERSION=$$(scripts/extract-version.sh branche $BRANCH_NAME)
         IMAGE_NAME=eu.gcr.io/${PROJECT_ID}/ked-pdi
-        IS_IMAGE_EXIST=$$(scripts/image-exists.sh $$IMAGE_NAME $SHORT_SHA)
+
+        scripts/config-env.sh branch $BRANCH_NAME $IMAGE_NAME $SHORT_SHA > /workspace/build.env
+
+        source /workspace/build.env
 
         echo "Branch: $BRANCH_NAME"
         echo "Commit: $SHORT_SHA"
-        echo "Env: $$NAMESPACE"
+        echo "Env: $$ENV"
         echo "Version: $$VERSION"
         echo "Image: $$IMAGE_NAME"
         echo "Is image exists ? $$IS_IMAGE_EXIST"
-
-        echo "export TAG_ENV=$$NAMESPACE" > /workspace/build.env
-        echo "export TAG_VERSION=$$VERSION" >> /workspace/build.env
-        echo "export IMAGE_NAME=$$IMAGE_NAME" >> /workspace/build.env
-        echo "export IS_IMAGE_EXIST=$$IS_IMAGE_EXIST" >> /workspace/build.env
 
   #build
   - name: gcr.io/cloud-builders/gcloud
@@ -41,7 +32,7 @@ steps:
         source /workspace/build.env
         gcloud builds submit \
               --config=cloudbuild/cloudbuild-build-pipeline.yaml \
-              --substitutions=_ENV=$$TAG_ENV,_VERSION=$$TAG_VERSION,_SHORT_SHA=$SHORT_SHA,_IMAGE_NAME=$$IMAGE_NAME
+              --substitutions=_ENV=$$ENV,_VERSION=$$VERSION,_SHORT_SHA=$SHORT_SHA,_IMAGE_NAME=$$IMAGE_NAME
 
 
   #deploy
@@ -54,7 +45,7 @@ steps:
           source /workspace/build.env
           gcloud builds submit \
                 --config=cloudbuild/cloudbuild-deploy-pipeline.yaml \
-                --substitutions=_ENV=$$TAG_ENV,_VERSION=$$TAG_VERSION,_SHORT_SHA=$SHORT_SHA,_IMAGE_NAME=$$IMAGE_NAME
+                --substitutions=_ENV=$$ENV,_VERSION=$$VERSION,_SHORT_SHA=$SHORT_SHA,_IMAGE_NAME=$$IMAGE_NAME
 
 
 timeout: 9000s
