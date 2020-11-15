@@ -45,7 +45,8 @@ steps:
           then
               gcloud builds submit \
                   --config=cloudbuild/cloudbuild-deploy-pipeline.yaml \
-                  --substitutions=_ENV=$$ENV,_VERSION=$$VERSION,_IMAGE_TAG=$SHORT_SHA,_IMAGE_NAME=$_IMAGE_NAME,_SERVICE_NAME=$${ENV}-ked-pdi
+                  --substitutions=_ENV=$$ENV,_VERSION=$$VERSION,_IMAGE_TAG=$SHORT_SHA,_IMAGE_NAME=$_IMAGE_NAME,\
+                  _SERVICE_NAME=$${ENV}-ked-pdi,_SHORT_SHA=$SHORT_SHA
           else
               echo "Image $SHORT_SHA not exists !"
           fi
