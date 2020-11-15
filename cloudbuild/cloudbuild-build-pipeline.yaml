@@ -2,27 +2,9 @@ substitutions:
   _GCS_CACHE_BUCKET: cloudbuild-m2repo
 
 steps:
-  - name: 'gcr.io/cloud-builders/gcloud'
-    id: 'env'
-    entrypoint: 'bash'
-    args:
-      - -c
-      - |
-
-        if [[ -z "$_NAMESPACE" ]]; then
-          NAMESPACE=$$(scripts/extract-namespace.sh $BRANCH_NAME)
-        else
-          NAMESPACE=$_NAMESPACE
-        fi
-
-        echo "Branch: $BRANCH_NAME"
-        echo "Commit: $COMMIT_SHA"
-        echo "Namespace: $$NAMESPACE"
-
-        echo "$$NAMESPACE" > /workspace/namespace.txt
-
   # load the cache from GCS if it exists
   - name: gcr.io/cloud-builders/gsutil
+    id: 'load-mvn-cache'
     dir: /root
     entrypoint: bash
     args:
@@ -36,18 +18,19 @@ steps:
     volumes:
       - name: m2
         path: /root/.m2/
+
   #build service
   - name: 'maven:3.6.2-jdk-12'
-    id: 'build'
+    id: 'mvn build'
     entrypoint: 'mvn'
     args: ['clean','package','-f','kpdi-api/pom.xml']
     volumes:
       - name: m2
         path: /root/.m2/
+
   # cache the /root/.m2 folder and upload it to GCS bucket
   - name: gcr.io/cloud-builders/gsutil
-    waitFor:
-      - build
+    id: 'save-mvn-cache'
     dir: /root
     entrypoint: bash
     args:
@@ -60,14 +43,21 @@ steps:
         path: /root/.m2/
   
   #build and push image
-  - name: gcr.io/kaniko-project/executor:latest
-    args: [
-            '--dockerfile=./Dockerfile',
-            '--destination=eu.gcr.io/$PROJECT_ID/ked-pdi:$SHORT_SHA'
-          ]
+  - name: gcr.io/cloud-builders/docker
+    id: 'build-and-push-image'
+    entrypoint: bash
+    args:
+        - -c
+        - |
+          docker build -t ${_IMAGE_NAME}:${_SHORT_SHA} \
+                       -t ${_IMAGE_NAME}:${_ENV} \
+                       -t ${_IMAGE_NAME}:${_VERSION} \
+                       -f Dockerfile .
+          docker push ${_IMAGE_NAME}:${_SHORT_SHA}
+          docker push ${_IMAGE_NAME}:${_ENV}
+          docker push ${_IMAGE_NAME}:${_VERSION}
+
 
 
 timeout: 9000s
-tags: ['build']
-options:
-  substitution_option: 'ALLOW_LOOSE'
+tags: ['build','${_SHORT_SHA}','${_VERSION}','${_ENV}']

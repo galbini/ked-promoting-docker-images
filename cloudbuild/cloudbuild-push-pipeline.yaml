@@ -1,0 +1,52 @@
+substitutions:
+  _IMAGE_NAME: eu.gcr.io/${PROJECT_ID}/ked-pdi
+
+steps:
+  - name: gcr.io/cloud-builders/gcloud
+    id: 'config-env'
+    entrypoint: 'bash'
+    args:
+      - -c
+      - |
+        scripts/config-env.sh branch $BRANCH_NAME $_IMAGE_NAME $SHORT_SHA > /workspace/build.env
+        source /workspace/build.env
+        printenv ENV VERSION IMAGE_NAME IS_IMAGE_EXIST
+
+  #build
+  - name: gcr.io/cloud-builders/gcloud
+    id: 'build'
+    entrypoint: bash
+    args:
+      - -c
+      - |
+        source /workspace/build.env
+        if [[ "$$IS_IMAGE_EXIST" == false ]]
+        then
+              gcloud builds submit \
+                    --config=cloudbuild/cloudbuild-build-pipeline.yaml \
+                    --substitutions=_ENV=$$ENV,_VERSION=$$VERSION,_SHORT_SHA=$SHORT_SHA,_IMAGE_NAME=$_IMAGE_NAME
+        else
+              echo "Image $SHORT_SHA exists !"
+        fi
+
+  #deploy
+  - name: gcr.io/cloud-builders/gcloud
+    id: 'deploy'
+    entrypoint: bash
+    args:
+        - -c
+        - |
+          source /workspace/build.env
+          if [[ "$$IS_IMAGE_EXIST" == false ]]
+          then
+              gcloud builds submit \
+                  --config=cloudbuild/cloudbuild-deploy-pipeline.yaml \
+                  --substitutions=_ENV=$$ENV,_VERSION=$$VERSION,_IMAGE_TAG=$SHORT_SHA,_IMAGE_NAME=$_IMAGE_NAME,_SERVICE_NAME=$${ENV}-ked-pdi
+          else
+              echo "Image $SHORT_SHA exists !"
+          fi
+
+timeout: 9000s
+tags: ['push','${SHORT_SHA}']
+options:
+  substitution_option: 'ALLOW_LOOSE'
