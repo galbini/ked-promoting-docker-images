@@ -21,9 +21,9 @@ management:
     git:
       mode: full
 info:
+  project: ${GOOGLE_CLOUD_PROJECT}
   env: ${ENV}
   version: ${VERSION}
-  project: ${GOOGLE_CLOUD_PROJECT}
   image-tag: ${IMAGE_TAG}
 
 
