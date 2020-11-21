@@ -35,7 +35,10 @@ steps:
     args:
       - -c
       - |
-        git remote set-url origin git@github.com:${_USER_NAME}/${_REPO_NAME}.git
+        REPO_ORIGIN=$$(git remote get-url --push origin)
+        USER_NAME=$$(cut -d'/' -f4 <<< $${REPO_ORIGIN})
+
+        git remote set-url origin git@github.com:$${USER_NAME}/${_REPO_NAME}.git
         git checkout -b ${_RELEASE_BRANCH_NAME}
         git config -l
     volumes:
