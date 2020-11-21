@@ -1,5 +1,8 @@
 substitutions:
   _RELEASE_BRANCH_NAME: release/${_VERSION//-rc//}
+  _REPO_NAME: ${REPO_NAME}
+  _SHORT_SHA: ${SHORT_SHA}
+
 # Access the id_github file from Secret Manager
 steps:
   - name: gcr.io/cloud-builders/gcloud
