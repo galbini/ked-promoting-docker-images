@@ -1,0 +1,7 @@
+steps:
+  - name: 'gcr.io/cloud-builders/git'
+    args: ['branch', '-a']
+
+
+timeout: 9000s
+tags: ['git']
