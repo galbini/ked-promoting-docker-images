@@ -30,6 +30,8 @@ steps:
       - -c
       - |
         git remote -v
+        git remote set-url origin git@ygithub.com:galbini/ked-promoting-docker-images.git
+        git remote -v
         git checkout -b release/test
         git push origin release/test
     volumes:
