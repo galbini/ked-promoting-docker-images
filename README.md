@@ -46,4 +46,4 @@ gcloud iam service-accounts add-iam-policy-binding $(PROJECT_NUMBER)-compute@dev
 ### / config ssh key for your repo and give access to GCP with secret manager
 https://cloud.google.com/cloud-build/docs/access-private-github-repos
 gcloud secrets create repo-kep-pdi-id --data-file=id_github
-
+TIPS echo '!.git' > .gcloudignore
