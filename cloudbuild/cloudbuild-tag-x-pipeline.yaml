@@ -49,7 +49,7 @@ steps:
             --substitutions=_ENV=$$ENV,_VERSION=$$VERSION,_SHORT_SHA=$SHORT_SHA,_REPO_NAME=$REPO_NAME
     volumes:
       - name: 'git'
-        path: .git
+        path: /workspace/.git
   #deploy
   - name: gcr.io/cloud-builders/gcloud
     id: 'deploy'
