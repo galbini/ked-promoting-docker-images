@@ -41,7 +41,7 @@ steps:
       - -c
       - |
         source /workspace/build.env
-        if [[ "$$IS_IMAGE_EXIST" == true && "$$VERSION" =~ ^[0-9]\.[0-9]\.X-rc$ ]]
+        if [[ "$$IS_IMAGE_EXIST" == true && "$$ENV" == stg ]]
         then
             gcloud builds submit \
                 --config=cloudbuild/cloudbuild-branch-pipeline.yaml \
