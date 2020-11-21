@@ -1,6 +1,6 @@
 substitutions:
   _VERSION_UC: ${_VERSION^^}
-  _RELEASE_BRANCH_NAME_RAW: release/${_VERSION_UC//-rc//}
+  _RELEASE_BRANCH_NAME: release/${_VERSION_UC//-RC//}
   _REPO_NAME: ${REPO_NAME}
   _SHORT_SHA: ${SHORT_SHA}
 
