@@ -37,7 +37,7 @@ steps:
       - |
         git remote set-url origin git@github.com:${_USER_NAME}/${_REPO_NAME}.git
         git checkout -b ${_RELEASE_BRANCH_NAME}
-        git push origin ${_RELEASE_BRANCH_NAME}
+        git config -l
     volumes:
       - name: 'ssh'
         path: /root/.ssh
