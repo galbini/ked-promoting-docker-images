@@ -13,9 +13,9 @@ steps:
         printenv ENV VERSION IMAGE_NAME IS_IMAGE_EXIST
         if [[ "$$IS_IMAGE_EXIST" == false ]]
         then
-          echo "Image $SHORT_SHA not exists !"
+          echo "IMAGE $SHORT_SHA NOT EXISTS !!!!"
           exit 1
-         fi
+        fi
 
   - name: gcr.io/cloud-builders/docker
     id: 'pull-tag-and-push-image'
@@ -24,20 +24,17 @@ steps:
       - -c
       - |
         source /workspace/build.env
-        if [[ "$$IS_IMAGE_EXIST" == true ]]
-        then
-            docker pull ${_IMAGE_NAME}:${SHORT_SHA}
 
-            docker tag ${_IMAGE_NAME}:${SHORT_SHA} \
-                       ${_IMAGE_NAME}:$${ENV}
-            docker tag ${_IMAGE_NAME}:${SHORT_SHA} \
-                       ${_IMAGE_NAME}:$${VERSION}
+        docker pull ${_IMAGE_NAME}:${SHORT_SHA}
 
-            docker push ${_IMAGE_NAME}:$${ENV}
-            docker push ${_IMAGE_NAME}:$${VERSION}
-        else
-            echo "Image $SHORT_SHA not exists !"
-        fi
+        docker tag ${_IMAGE_NAME}:${SHORT_SHA} \
+                   ${_IMAGE_NAME}:$${ENV}
+        docker tag ${_IMAGE_NAME}:${SHORT_SHA} \
+                   ${_IMAGE_NAME}:$${VERSION}
+
+        docker push ${_IMAGE_NAME}:$${ENV}
+        docker push ${_IMAGE_NAME}:$${VERSION}
+
   #deploy
   - name: gcr.io/cloud-builders/gcloud
     id: 'deploy'
@@ -46,14 +43,10 @@ steps:
         - -c
         - |
           source /workspace/build.env
-          if [[ "$$IS_IMAGE_EXIST" == true ]]
-          then
-              gcloud builds submit \
-                  --config=cloudbuild/cloudbuild-deploy-pipeline.yaml \
-                  --substitutions=_ENV=$$ENV,_VERSION=$$VERSION,_IMAGE_TAG=$SHORT_SHA,_IMAGE_NAME=$_IMAGE_NAME,_SERVICE_NAME=$${ENV}-ked-pdi,_SHORT_SHA=$SHORT_SHA
-          else
-              echo "Image $SHORT_SHA not exists !"
-          fi
+
+          gcloud builds submit \
+              --config=cloudbuild/cloudbuild-deploy-pipeline.yaml \
+              --substitutions=_ENV=$$ENV,_VERSION=$$VERSION,_IMAGE_TAG=$SHORT_SHA,_IMAGE_NAME=$_IMAGE_NAME,_SERVICE_NAME=$${ENV}-ked-pdi,_SHORT_SHA=$SHORT_SHA
 
 timeout: 9000s
 tags: ['tag','${SHORT_SHA}']
