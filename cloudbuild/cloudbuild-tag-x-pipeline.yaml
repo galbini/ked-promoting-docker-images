@@ -11,6 +11,11 @@ steps:
         scripts/config-env.sh tag $TAG_NAME $_IMAGE_NAME $SHORT_SHA > /workspace/build.env
         source /workspace/build.env
         printenv ENV VERSION IMAGE_NAME IS_IMAGE_EXIST
+        if [[ "$$IS_IMAGE_EXIST" == false ]]
+        then
+          echo "Image $SHORT_SHA not exists !"
+          exit 1
+        fi
 
   - name: gcr.io/cloud-builders/docker
     id: 'pull-tag-and-push-image'
