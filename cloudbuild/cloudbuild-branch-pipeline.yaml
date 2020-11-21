@@ -1,5 +1,5 @@
 substitutions:
-  _RELEASE_BRANCH_NAME: release/${_VERSION//-rc//^^}
+  _RELEASE_BRANCH_NAME: release/${_VERSION//-rc//}
   _REPO_NAME: ${REPO_NAME}
   _SHORT_SHA: ${SHORT_SHA}
 
@@ -35,11 +35,13 @@ steps:
       - -c
       - |
         git remote set-url origin git@github.com:galbini/${_REPO_NAME}.git
-        git checkout -b ${_RELEASE_BRANCH_NAME}
-        git push origin ${_RELEASE_BRANCH_NAME}
+        git checkout -b ${_RELEASE_BRANCH_NAME^^}
+        git push origin ${_RELEASE_BRANCH_NAME^^}
     volumes:
       - name: 'ssh'
         path: /root/.ssh
 
 timeout: 9000s
 tags: ['git-branch','${_SHORT_SHA}','${_VERSION}','${_ENV}']
+options:
+  dynamic_substitutions: true
