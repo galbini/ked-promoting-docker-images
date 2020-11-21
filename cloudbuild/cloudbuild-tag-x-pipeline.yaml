@@ -13,7 +13,7 @@ steps:
         printenv ENV VERSION IMAGE_NAME IS_IMAGE_EXIST
         if [[ "$$IS_IMAGE_EXIST" == false ]]
         then
-          echo "IMAGE $SHORT_SHA NOT EXISTS !!!!"
+          echo "IMAGE ${_IMAGE_NAME}:$SHORT_SHA NOT EXISTS !!!!"
           exit 1
         fi
 
