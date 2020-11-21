@@ -2,6 +2,7 @@ substitutions:
   _RELEASE_BRANCH_NAME: release/${_VERSION//-rc//}
   _REPO_NAME: ${REPO_NAME}
   _SHORT_SHA: ${SHORT_SHA}
+  _USER_NAME: galbini
 
 # Access the id_github file from Secret Manager
 steps:
@@ -34,7 +35,7 @@ steps:
     args:
       - -c
       - |
-        git remote set-url origin git@github.com:galbini/${_REPO_NAME}.git
+        git remote set-url origin git@github.com:${_USER_NAME}/${_REPO_NAME}.git
         git checkout -b ${_RELEASE_BRANCH_NAME}
         git push origin ${_RELEASE_BRANCH_NAME}
     volumes:
