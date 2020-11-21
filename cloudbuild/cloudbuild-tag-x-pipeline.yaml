@@ -37,6 +37,19 @@ steps:
 
   #deploy
   - name: gcr.io/cloud-builders/gcloud
+    id: 'git-push-branch'
+    entrypoint: bash
+    args:
+      - -c
+      - |
+        source /workspace/build.env
+
+        gcloud builds submit \
+            --config=cloudbuild/cloudbuild-branch-pipeline.yaml \
+            --substitutions=_ENV=$$ENV,_VERSION=$$VERSION,_SHORT_SHA=$SHORT_SHA,_REPO_NAME=$REPO_NAME
+
+  #deploy
+  - name: gcr.io/cloud-builders/gcloud
     id: 'deploy'
     entrypoint: bash
     args:
