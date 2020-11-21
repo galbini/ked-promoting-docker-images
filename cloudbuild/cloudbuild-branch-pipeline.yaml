@@ -1,7 +1,12 @@
 steps:
   - name: 'gcr.io/cloud-builders/git'
-    args: ['checkout', '-b', 'release/test']
-
+    id: 'git-release-branch'
+    entrypoint: bash
+    args:
+      - -c
+      - |
+        git checkout -b release/test
+        git push origin release/test
 
 timeout: 9000s
 tags: ['git']
