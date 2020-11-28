@@ -1,6 +1,7 @@
 substitutions:
   _GCS_CACHE_BUCKET: cloudbuild-m2repo
-  _SHORT_SHA: $SHORT_SHA
+  _SHORT_SHA: ${SHORT_SHA}
+  _IMAGE_NAME: eu.gcr.io/${PROJECT_ID}/ked-pdi
 
 steps:
   # load the cache from GCS if it exists
