@@ -1,52 +1,57 @@
 substitutions:
-  _IMAGE_NAME: eu.gcr.io/${PROJECT_ID}/ked-pdi
+  _GCS_CACHE_BUCKET: cloudbuild-m2repo
+  _SHORT_SHA: $SHORT_SHA
 
 steps:
-  - name: gcr.io/cloud-builders/gcloud
-    id: 'config-env'
-    entrypoint: 'bash'
-    args:
-      - -c
-      - |
-        scripts/config-env.sh branch $BRANCH_NAME $_IMAGE_NAME $SHORT_SHA > /workspace/build.env
-        source /workspace/build.env
-        printenv ENV VERSION IMAGE_NAME IS_IMAGE_EXIST
-
-  #build
-  - name: gcr.io/cloud-builders/gcloud
-    id: 'build'
+  # load the cache from GCS if it exists
+  - name: gcr.io/cloud-builders/gsutil
+    id: 'load-mvn-cache'
+    dir: /root
     entrypoint: bash
     args:
       - -c
       - |
-        source /workspace/build.env
-        if [[ "$$IS_IMAGE_EXIST" == false ]]
-        then
-              gcloud builds submit \
-                    --config=cloudbuild/cloudbuild-build-pipeline.yaml \
-                    --substitutions=_ENV=$$ENV,_VERSION=$$VERSION,_SHORT_SHA=$SHORT_SHA,_IMAGE_NAME=$_IMAGE_NAME
-        else
-              echo "Image $SHORT_SHA exists !"
-        fi
+        (
+          ls -la /root/.m2
+          gsutil cp gs://${PROJECT_ID}_${_GCS_CACHE_BUCKET}/m2-cache.tar.gz /tmp/m2-cache.tar.gz &&
+          tar -xzf /tmp/m2-cache.tar.gz
+        ) || echo 'Cache not found'
+    volumes:
+      - name: m2
+        path: /root/.m2/
 
-  #deploy
-  - name: gcr.io/cloud-builders/gcloud
-    id: 'deploy'
+  #build service
+  - name: 'maven:3.6.2-jdk-12'
+    id: 'mvn build'
+    entrypoint: 'mvn'
+    args: ['clean','package','-f','kpdi-api/pom.xml']
+    volumes:
+      - name: m2
+        path: /root/.m2/
+
+  # cache the /root/.m2 folder and upload it to GCS bucket
+  - name: gcr.io/cloud-builders/gsutil
+    id: 'save-mvn-cache'
+    dir: /root
+    entrypoint: bash
+    args:
+      - -c
+      - |
+        tar -czf /tmp/m2-cache.tar.gz .m2 &&
+        gsutil cp /tmp/m2-cache.tar.gz gs://${PROJECT_ID}_${_GCS_CACHE_BUCKET}/m2-cache.tar.gz
+    volumes:
+      - name: m2
+        path: /root/.m2/
+  
+  #build and push image
+  - name: gcr.io/cloud-builders/docker
+    id: 'build-and-push-image'
     entrypoint: bash
     args:
         - -c
         - |
-          source /workspace/build.env
-          if [[ "$$IS_IMAGE_EXIST" == false ]]
-          then
-              gcloud builds submit \
-                  --config=cloudbuild/cloudbuild-deploy-pipeline.yaml \
-                  --substitutions=_ENV=$$ENV,_VERSION=$$VERSION,_IMAGE_TAG=$SHORT_SHA,_IMAGE_NAME=$_IMAGE_NAME,_SERVICE_NAME=$${ENV}-ked-pdi,_SHORT_SHA=$SHORT_SHA
-          else
-              echo "Image $SHORT_SHA exists !"
-          fi
+          docker build -t ${_IMAGE_NAME}:${_SHORT_SHA} -f Dockerfile .
+          docker push ${_IMAGE_NAME}:${_SHORT_SHA}
 
 timeout: 9000s
-tags: ['push','${SHORT_SHA}']
-options:
-  substitution_option: 'ALLOW_LOOSE'
+tags: ['build','${_SHORT_SHA}']
