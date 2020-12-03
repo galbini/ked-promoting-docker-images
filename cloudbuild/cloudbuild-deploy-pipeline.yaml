@@ -12,12 +12,13 @@ steps:
         - -c
         - |
           source /workspace/build.env
-          gcloud run deploy ${_SERVICE_NAME} \
+          gcloud beta run deploy ${_SERVICE_NAME} \
             --image=${_IMAGE_NAME}:${_IMAGE_TAG} \
             --region=europe-west1 \
             --platform=managed \
             --allow-unauthenticated \
             --memory=512M \
+            --min-instances=1 \
             --set-env-vars=GOOGLE_CLOUD_PROJECT=${PROJECT_ID},ENV=${_ENV},VERSION=${_VERSION},IMAGE_TAG=${_IMAGE_TAG}
 
 timeout: 9000s
