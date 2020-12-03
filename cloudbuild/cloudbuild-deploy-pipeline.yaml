@@ -18,7 +18,9 @@ steps:
             --platform=managed \
             --allow-unauthenticated \
             --memory=512M \
-            --set-env-vars=GOOGLE_CLOUD_PROJECT=${PROJECT_ID},ENV=${_ENV},VERSION=${_VERSION},IMAGE_TAG=${_IMAGE_TAG}
+            --min-instances=1 \
+            --set-env-vars=GOOGLE_CLOUD_PROJECT=${PROJECT_ID},ENV=${_ENV},VERSION=${_VERSION},IMAGE_TAG=${_IMAGE_TAG} \
+            --update-labels=ENV=${_ENV},VERSION=${_VERSION},IMAGE_TAG=${_IMAGE_TAG}
 
 timeout: 9000s
 tags: ['deploy','${_SHORT_SHA}','${_VERSION}','${_ENV}']
