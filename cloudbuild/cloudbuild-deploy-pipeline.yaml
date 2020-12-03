@@ -12,7 +12,7 @@ steps:
         - -c
         - |
           source /workspace/build.env
-          gcloud run deploy ${_SERVICE_NAME} \
+          gcloud beta run deploy ${_SERVICE_NAME} \
             --image=${_IMAGE_NAME}:${_IMAGE_TAG} \
             --region=europe-west1 \
             --platform=managed \
