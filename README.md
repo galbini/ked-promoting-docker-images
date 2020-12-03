@@ -20,22 +20,22 @@ gcloud services enable cloudbuild.googleapis.com
 gcloud services enable run.googleapis.com  
 gcloud services enable secretmanager.googleapis.com  
 
-## Config maven cache
+## Config maven cache location
 gsutil mb -p $PROJECT_ID -l europe-west1  gs://$($PROJECT_ID)_cloudbuild-m2repo/
 
-## Add role cloud admin to cloud build
+## Add role Cloud Admin to Cloud Build
 
 gcloud projects add-iam-policy-binding $PROJECT_ID \
 --member serviceAccount:$(PROJECT_NUMBER)@cloudbuild.gserviceaccount.com \
 --role roles/run.admin
 
-## Add role Secret Manager Secret Accessor to cloud build
+## Add role Secret Manager Secret Accessor to Cloud Build
 
 gcloud projects add-iam-policy-binding $PROJECT_ID \
 --member serviceAccount:$(PROJECT_NUMBER)@cloudbuild.gserviceaccount.com \
 --role roles/secretmanager.secretAccessor
 
-## Add service account user to cloudrun for service account cloudbuild
+## Add service account user to Cloud Run for service account Cloud Build
 
 gcloud iam service-accounts add-iam-policy-binding $(PROJECT_NUMBER)-compute@developer.gserviceaccount.com  \ 
 --member serviceAccount:$(PROJECT_NUMBER)@cloudbuild.gserviceaccount.com  \
