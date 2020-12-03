@@ -10,7 +10,11 @@ steps:
       - |
         scripts/config-env.sh branch $BRANCH_NAME $_IMAGE_NAME $SHORT_SHA > /workspace/build.env
         source /workspace/build.env
-        printenv ENV VERSION IMAGE_NAME IS_IMAGE_EXIST
+
+        echo "Image: $$IMAGE_NAME"
+        echo "Version: $$VERSION"
+        echo "Env: $$ENV"
+        echo "Does the image exist? $$IS_IMAGE_EXIST"
 
   #build
   - name: gcr.io/cloud-builders/gcloud
