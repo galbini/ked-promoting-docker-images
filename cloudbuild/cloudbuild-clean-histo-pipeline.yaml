@@ -1,0 +1,16 @@
+
+steps:
+  #clean
+  - name: gcr.io/cloud-builders/gcloud
+    id: 'deploy-to-cloud-run'
+    entrypoint: bash
+    args:
+        - -c
+        - |
+          echo "clean"
+
+timeout: 9000s
+tags: ['clean']
+
+options:
+  dynamic_substitutions: true
