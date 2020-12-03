@@ -8,8 +8,8 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class Controller {
 
-    @GetMapping("/version")
+    @GetMapping("/hello")
     public ResponseEntity<String> version() {
-        return new ResponseEntity<>("Done", HttpStatus.OK);
+        return new ResponseEntity<>("Hello KED !", HttpStatus.OK);
     }
 }
