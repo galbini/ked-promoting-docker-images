@@ -47,7 +47,12 @@ steps:
                   --config=cloudbuild/cloudbuild-deploy-pipeline.yaml \
                   --substitutions=_ENV=$$ENV,_VERSION=$$VERSION,_IMAGE_TAG=$SHORT_SHA,_IMAGE_NAME=$_IMAGE_NAME,_SERVICE_NAME=$${ENV}-ked-pdi,_SHORT_SHA=$SHORT_SHA
           else
-              echo "Image $SHORT_SHA exists !"
+              if [[ "$$IS_IMAGE_EXIST" ]]
+              then
+                echo "Image $SHORT_SHA exists !"
+              else
+                echo "fix"
+              fi
           fi
 
 timeout: 9000s
