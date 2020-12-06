@@ -41,7 +41,7 @@ steps:
         - -c
         - |
           source /workspace/build.env
-          if [[ "$$IS_IMAGE_EXIST" == false ]]
+          if [[ "$$IS_IMAGE_EXIST" == false && "$$ENV" != "fix" ]]
           then
               gcloud builds submit \
                   --config=cloudbuild/cloudbuild-deploy-pipeline.yaml \

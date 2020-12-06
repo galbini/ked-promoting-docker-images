@@ -16,6 +16,9 @@ env_from_branch_name() {
     elif [[ "$BRANCH_NAME" =~ ^release//* ]]
     then
         echo stg
+    elif [[ "$BRANCH_NAME" =~ ^.*fix//* ]]
+    then
+        echo fix
     else
         exit 1
     fi
@@ -46,6 +49,10 @@ version_from_branch_name() {
     then
         echo int
     elif [[ "$BRANCH_NAME" =~ ^release//* ]]
+    then
+        VERSION=$(cut -d'/' -f2 <<< ${BRANCH_NAME})
+        echo ${VERSION}-rc
+    elif [[ "$BRANCH_NAME" =~ ^.*fix//* ]]
     then
         VERSION=$(cut -d'/' -f2 <<< ${BRANCH_NAME})
         echo ${VERSION}-rc

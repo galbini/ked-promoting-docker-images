@@ -75,7 +75,6 @@
 					<includeOnlyProperties>
 						<includeOnlyProperty>git.commit.time</includeOnlyProperty>
 						<includeOnlyProperty>git.commit.id.abbrev</includeOnlyProperty>
-						<includeOnlyProperty>git.tags</includeOnlyProperty>
 					</includeOnlyProperties>
 				</configuration>
 			</plugin>
