@@ -12,7 +12,7 @@ public class Controller {
     public ResponseEntity<Hello> version() {
         return new ResponseEntity<>(
                 ImmutableHello.builder()
-                        .message("Bonjour !")
+                        .message("Bonjour KED!")
                         .build(),
                 HttpStatus.OK);
     }
