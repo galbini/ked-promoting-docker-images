@@ -10,6 +10,6 @@ public class Controller {
 
     @GetMapping("/hello")
     public ResponseEntity<String> version() {
-        return new ResponseEntity<>("Hello !", HttpStatus.OK);
+        return new ResponseEntity<>("Hello KED !", HttpStatus.OK);
     }
 }
